@@ -1,0 +1,24 @@
+{{- if .Values.knative.enabled }}
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: sre-auto-remediation
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/target: "{{ .Values.knative.remediationService.concurrencyTarget }}"
+    spec:
+      containers:
+      - image: {{ .Values.knative.remediationService.image }}
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.global.configMapName }}
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 64Mi
+{{- end }}

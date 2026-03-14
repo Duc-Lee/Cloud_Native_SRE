@@ -1,0 +1,46 @@
+# Global settings for the cloud-sre shared
+global:
+  configMapName: cloud-sre-config
+  imagePullPolicy: IfNotPresent
+  imageTag: "latest"
+
+# Microservices configuration
+services:
+  user:
+    enabled: true
+    replicas: 2
+    port: 3000
+    cpuRequest: 100m
+    memRequest: 128Mi
+  order:
+    enabled: true
+    replicas: 2
+    port: 3000
+    cpuRequest: 100m
+    memRequest: 128Mi
+  payment:
+    enabled: true
+    replicas: 1
+    port: 3000
+    cpuRequest: 100m
+    memRequest: 128Mi
+  notification:
+    enabled: true
+    replicas: 1
+    cpuRequest: 50m
+    memRequest: 64Mi
+
+# Serverless settings (Knative)
+knative:
+  enabled: true
+  remediationService:
+    concurrencyTarget: 10
+    image: sre-bot:latest
+
+# Middleware toggles (set to false if using managed services)
+rabbitmq:
+  enabled: true
+postgres:
+  enabled: true
+redis:
+  enabled: true

@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: cloud_sre
+      POSTGRES_USER: sre_user
+      POSTGRES_PASSWORD: password
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+
+  redis:
+    image: redis:7
+
+  user:
+    build: services/user
+    ports:
+      - "3001:3000"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PASSWORD: password
+
+  auth:
+    build: services/auth
+    ports:
+      - "3004:3000"
+
+  order:
+    build: services/order
+    ports:
+      - "3002:3000"
+    environment:
+      USER_SERVICE_URL: http://user:3000
+      RABBIT_URL: amqp://guest:guest@rabbitmq:5672/
+
+  payment:
+    build: services/payment
+    ports:
+      - "3003:3000"
+
+  cart:
+    build: services/cart
+    ports:
+      - "3005:3000"
+
+  product:
+    build: services/product
+    ports:
+      - "3006:3000"
+
+  notification:
+    build: services/notification
+    environment:
+      RABBIT_URL: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      - rabbitmq

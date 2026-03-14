@@ -1,0 +1,7 @@
+Availability: 99.9%
+SLI: sum(rate(http_requests_total{status!~"5.."}[30d])) / sum(rate(http_requests_total[30d]))
+
+P95 Latency: 500ms
+SLI: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[30d])) by (le, app))
+
+Policy: Burn > 80% budget = Feature freeze.

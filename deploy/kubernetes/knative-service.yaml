@@ -1,0 +1,12 @@
+apiVersion: api.cloudevents.io/v1
+kind: Service
+metadata:
+  name: sre-bot
+spec:
+  template:
+    spec:
+      containers:
+      - image: sre-bot:latest
+        env:
+        - name: RABBIT_URL
+          value: "amqp://guest:guest@rabbitmq:5672/"

@@ -1,0 +1,26 @@
+groups:
+- name: service_alerts
+  rules:
+  - alert: HighErrorRate
+    expr: |
+      sum(rate(http_requests_total{status=~"5.."}[5m])) by (app) 
+      / 
+      sum(rate(http_requests_total[5m])) by (app) > 0.05
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "{{ $labels.app }} error rate high"
+
+  - alert: LatencyThreshold
+    expr: |
+      histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, app)) > 0.5
+    for: 3m
+    labels:
+      severity: warning
+
+  - alert: PodDown
+    expr: up == 0
+    for: 1m
+    labels:
+      severity: critical

@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+prometheus_client
+httpx
+pika
+redis

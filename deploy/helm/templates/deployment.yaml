@@ -1,0 +1,55 @@
+{{- range $name, $config := .Values.services }}
+{{- if $config.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}-service
+  labels:
+    app: {{ $name }}-service
+spec:
+  replicas: {{ $config.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ $name }}-service
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}-service
+    spec:
+      containers:
+        - name: {{ $name }}
+          image: "{{ $name }}-service:{{ $.Values.global.imageTag }}"
+          imagePullPolicy: {{ $.Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: {{ $config.port | default 3000 }}
+          envFrom:
+            - configMapRef:
+                name: {{ $.Values.global.configMapName }}
+          resources:
+            requests:
+              cpu: {{ $config.cpuRequest | default "100m" }}
+              memory: {{ $config.memRequest | default "128Mi" }}
+            limits:
+              cpu: "300m"
+              memory: "256Mi"
+          startupProbe:
+            httpGet:
+              path: /health
+              port: {{ $config.port | default 3000 }}
+            failureThreshold: 30
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ $config.port | default 3000 }}
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ $config.port | default 3000 }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+{{- end }}
+{{- end }}

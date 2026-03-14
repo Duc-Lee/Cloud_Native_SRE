@@ -1,0 +1,43 @@
+{
+    "title": "Platform Golden Signals",
+    "panels": [
+        {
+            "title": "Latency (P99)",
+            "type": "timeseries",
+            "targets": [
+                {
+                    "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, app))",
+                    "legendFormat": "{{app}}"
+                }
+            ]
+        },
+        {
+            "title": "Throughput (RPS)",
+            "type": "timeseries",
+            "targets": [
+                {
+                    "expr": "sum(rate(http_requests_total[5m])) by (app)",
+                    "legendFormat": "{{app}}"
+                }
+            ]
+        },
+        {
+            "title": "Error Rate",
+            "type": "timeseries",
+            "targets": [
+                {
+                    "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) by (app) / sum(rate(http_requests_total[5m])) by (app)",
+                    "legendFormat": "{{app}}"
+                }
+            ]
+        }
+    ],
+    "schemaVersion": 36,
+    "style": "dark",
+    "tags": ["sre"],
+    "time": {
+        "from": "now-1h",
+        "to": "now"
+    },
+    "uid": "golden-signals"
+}
