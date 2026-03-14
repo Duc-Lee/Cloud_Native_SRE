@@ -1,18 +1,20 @@
 import json
-import time
+import logging
+
+log = logging.getLogger("sre.monitor")
 
 def handle(req):
-    # monitor error rates
-    err_rate = 0.35 
+    """Circuit Breaker: Error Rate Monitor"""
+    # Threshold check
+    error_rate = 0.35 
+    status = "alert" if error_rate > 0.2 else "ok"
     
-    if err_rate > 0.3:
-        print(f"high error rate ({err_rate}) - locking down")
-        state = "OPEN"
-    else:
-        state = "CLOSED"
-    
+    log.info(f"Metric check: error_rate={error_rate} -> status={status}")
+
     return json.dumps({
-        "circuit": state,
-        "rate": err_rate,
-        "updated": int(time.time())
+        "status": status,
+        "circuit": "open" if status == "alert" else "closed",
+        "metrics": {"rate": error_rate, "threshold": 0.2}
     })
+
+

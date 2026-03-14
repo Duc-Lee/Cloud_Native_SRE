@@ -1,38 +1,49 @@
-name: CI/CD Pipeline
-
+name: Build and Push Project
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
+    branches:
+      - main
 jobs:
-  build-and-test:
+  build-project:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service: [user-service, order-service, payment-service, notification-worker]
-
     steps:
-    - uses: actions/checkout@v3
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: install dependencies
+        run: |
+          pip install pytest
+          pip install -r services/auth/requirements.txt
+          pip install -r services/cart/requirements.txt
+          pip install -r services/notification/requirements.txt
+          pip install -r services/order/requirements.txt
+          pip install -r services/payment/requirements.txt
+          pip install -r services/product/requirements.txt
+          pip install -r services/user/requirements.txt
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
+      - name: run tests
+        run: |
+          pytest services/auth/
+          pytest services/cart/
+          pytest services/notification/
+          pytest services/order/
+          pytest services/payment/
+          pytest services/product/
+          pytest services/user/
 
-    - name: Install dependencies
-      run: |
-        cd services/${{ matrix.service }}
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        pip install pytest
+      - name: build docker images
+        run: |
+          docker build -t auth-service:latest services/auth
+          docker build -t cart-service:latest services/cart
+          docker build -t notification-service:latest services/notification
+          docker build -t order-service:latest services/order
+          docker build -t payment-service:latest services/payment
+          docker build -t product-service:latest services/product
+          docker build -t user-service:latest services/user
+          docker build -t sre-bot-remediator:latest knative_functions/sre-bot
 
-    - name: Run tests
-      run: |
-        cd services/${{ matrix.service }}
-        # Skip if no tests yet, but show the command
-        pytest || echo "No tests found for ${{ matrix.service }}"
 
-    - name: Build Docker Image
-      run: |
-        docker build -t ${{ matrix.service }}:latest services/${{ matrix.service }}
+

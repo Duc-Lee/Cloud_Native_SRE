@@ -1,22 +1,22 @@
 import json
+import logging
+
+log = logging.getLogger("sre.scaler")
 
 def handle(req):
-    try:
-        event = json.loads(req)
-        val = float(event.get("amount", 0))
-        
-        print(f"evaluating order: {val}")
-        
-        # scale based on load anticipation
-        if val > 500:
-            print("scaling up payment service (vip)")
-            replicas = 5
-        else:
-            replicas = 1
+    """Auto-scaler for high-value transactions"""
+    data = json.loads(req or '{}')
+    val = float(data.get("amount") or 0)
+    
+    if val < 500:
+        return json.dumps({"op": "skip", "val": val})
 
-        return json.dumps({
-            "target": "payment",
-            "scale": replicas
-        })
-    except:
-        return json.dumps({"err": "invalid payload"})
+    log.info(f"Scaling required: value={val} -> target=payment")
+    return json.dumps({
+        "action": "scale", 
+        "service": "payment",
+        "replicas": 5 if val < 1000 else 10,
+        "reason": "high_value_order"
+    })
+
+
