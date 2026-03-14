@@ -6,47 +6,34 @@ data:
   nginx.conf: |
     worker_processes auto;
     events { worker_connections 1024; }
-
     http {
         include /etc/nginx/mime.types;
         sendfile on;
-
-        # Standard proxy settings
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        
         limit_req_zone $binary_remote_addr zone=api_limit:10m rate=10r/s;
-
         server {
             listen 80;
-
-            # Auth is critical
             location /auth {
                 limit_req zone=api_limit burst=10;
                 proxy_pass http://auth:3000;
             }
-
             location /users {
                 proxy_pass http://user:3000;
             }
-
             location /products {
                 proxy_pass http://product:3000;
             }
-
             location /cart {
                 proxy_pass http://cart:3000;
             }
-
             location /orders {
                 proxy_pass http://order:3000;
             }
-
             location /pay {
                 proxy_pass http://payment:3000;
             }
-
             location /health {
                 return 200 'alive';
                 add_header Content-Type text/plain;
