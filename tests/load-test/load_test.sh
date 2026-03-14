@@ -1,10 +1,9 @@
 #!/bin/bash
-# Simple load generator for HPA testing
 
 URL=${1:-"http://localhost:80/order"}
 DURATION=${2:-60}
 
-echo "Generating load on $URL for $DURATION seconds"
+echo "[LOAD] Hitting $URL for ${DURATION}s"
 
 END_TIME=$((SECONDS + DURATION))
 
@@ -13,4 +12,4 @@ while [ $SECONDS -lt $END_TIME ]; do
   sleep 0.1
 done
 
-echo "Load test complete. Check HPA status with: kubectl get hpa"
+echo "Done. Watch HPA: kubectl get hpa -w"
