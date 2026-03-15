@@ -1,26 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth
+  name: notification
 spec:
-  replicas: 1 
+  replicas: 1
   selector:
     matchLabels:
-      app: auth
+      app: notification
   template:
     metadata:
       labels:
-        app: auth
+        app: notification
     spec:
       containers:
-      - name: auth
-        image: auth:latest
+      - name: notification
+        image: notification:latest
+        ports:
+        - containerPort: 3000
         env:
-        - name: JWT_SECRET_KEY
+        - name: RABBIT_URL
           valueFrom:
             secretKeyRef:
               name: cloud-sre-secrets
-              key: JWT_SECRET_KEY
+              key: RABBITMQ_URL # Note: I should ensure this is in secrets.yaml
         resources:
           requests:
             cpu: "50m"
@@ -44,10 +46,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth
+  name: notification
 spec:
   selector:
-    app: auth
+    app: notification
   ports:
   - protocol: TCP
     port: 3000

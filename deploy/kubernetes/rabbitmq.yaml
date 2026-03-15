@@ -18,6 +18,24 @@ spec:
         ports:
         - containerPort: 5672
         - containerPort: 15672
+        env:
+        - name: RABBITMQ_DEFAULT_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloud-sre-secrets
+              key: RABBITMQ_USER
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: cloud-sre-secrets
+              key: RABBITMQ_PASS
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
         volumeMounts:
         - name: config
           mountPath: /etc/rabbitmq/rabbitmq.conf
@@ -25,6 +43,18 @@ spec:
         - name: definitions
           mountPath: /etc/rabbitmq/definitions.json
           subPath: definitions.json
+        - name: rabbit-data
+          mountPath: /var/lib/rabbitmq
+        livenessProbe:
+          exec:
+            command: ["rabbitmq-diagnostics", "check_port_connectivity"]
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          exec:
+            command: ["rabbitmq-diagnostics", "check_running"]
+          initialDelaySeconds: 10
+          periodSeconds: 10
       volumes:
       - name: config
         configMap:
@@ -32,6 +62,8 @@ spec:
       - name: definitions
         configMap:
           name: rabbitmq-definitions
+      - name: rabbit-data
+        emptyDir: {} 
 ---
 apiVersion: v1
 kind: ConfigMap

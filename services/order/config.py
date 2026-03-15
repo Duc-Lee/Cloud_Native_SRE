@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     PAYMENT_SERVICE_URL: str
     RABBIT_URL: str
     REDIS_HOST: str
+    JWT_SECRET_KEY: str
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 if __name__ ==   "__main__":

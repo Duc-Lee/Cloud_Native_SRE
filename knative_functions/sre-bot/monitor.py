@@ -1,20 +1,18 @@
 import json
 import logging
 
-log = logging.getLogger("sre.monitor")
+log = logging.getLogger("viettel.sre.monitor")
 
 def handle(req):
-    """Circuit Breaker: Error Rate Monitor"""
-    # Threshold check
-    error_rate = 0.35 
-    status = "alert" if error_rate > 0.2 else "ok"
-    
-    log.info(f"Metric check: error_rate={error_rate} -> status={status}")
+    print("Checking monitor...")
+    # ti le loi 
+    rate = 0.35 
 
-    return json.dumps({
-        "status": status,
-        "circuit": "open" if status == "alert" else "closed",
-        "metrics": {"rate": error_rate, "threshold": 0.2}
-    })
+    if rate > 0.2:
+        print("NGUY HIEM: error rate cao qua!")
+        return '{"status": "alert", "circuit": "open"}'
+    else:
+        print("Van on...")
+        return '{"status": "ok", "circuit": "closed"}'
 
 

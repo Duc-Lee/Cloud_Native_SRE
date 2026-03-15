@@ -1,54 +1,49 @@
-# Cloud Native SRE Project
+# Viettel Cloud Native SRE (CN-SRE) Platform
 
-This project simulates a cloud-native microservices system with a focus on SRE (Site Reliability Engineering) automation. It includes auto-scaling, self-healing bots, and observability tools.
+Hệ thống giả lập môi trường Microservices chuẩn Cloud Native phục vụ nghiên cứu và triển khai các giải pháp SRE (Site Reliability Engineering) tự động hóa. Dự án tập trung vào việc xử lý các kịch bản thực tế về Self-healing, Traffic Scaling và giám sát SLO/SLI cho hạ tầng Viettel.
 
-## System Components
+## 1. Kiến trúc hệ thống
+Hệ thống bao gồm 8 microservices chính được viết trên nền tảng Python (FastAPI):
+- **Core Services**: `auth`, `user`, `product`, `cart`.
+- **Transaction Services**: `order`, `payment`, `notification`.
+- **SRE Bot**: Thành phần remediation (Knative) tự động xử lý sự cố.
+- **Infrastucture**: Postgres (persistence), Redis (cache), RabbitMQ (event bus).
 
-- **Services**: 7 microservices (auth, cart, notification, order, payment, product, user) built with Python.
-- **SRE Bot**: Knative functions for automated remediation (restarting services, clearing cache).
-- **Messaging**: RabbitMQ for asynchronous communication.
-- **Data**: Postgres for persistence and Redis for caching.
-- **Observability**: Prometheus and Grafana for metrics and visualization.
+## 2. Hướng dẫn triển khai
+Dự án hỗ trợ triển khai nhanh qua Makefile.
 
-## Project Structure
+### Local Development (Docker Compose)
+1. Copy cấu hình mẫu: `cp .env.example .env`
+2. Build & Up:
+   ```bash
+   make build
+   docker-compose up -d
+   ```
 
-```text
-/services           - Microservice source code
-/knative_functions  - SRE bot automation scripts
-/deploy             - Kubernetes manifests and helm charts
-/database           - SQL migrations and init scripts
-/sre                - SLO/SLI configs and alerting rules
-/tests              - Load tests and SRE simulators
-```
-
-## Getting Started
-
-### 1. Build & Deploy
-Use the provided Makefile to build and deploy everything:
-
+### Kubernetes (Production-ready)
+Triển khai lên Cluster k8s (yêu cầu kubectl đã cấu hình):
 ```bash
-# Build all docker images
-make build
-
-# Deploy to Kubernetes
 make deploy
 ```
+*Note: Ingress đã cấu hình Basic Auth (`leanhduc` / `anhdc2005`) để bảo vệ gateway.*
 
-### 2. Monitoring
-Access Grafana to view the system health and SLO dashboards:
-- URL: `http://localhost:3000` (after port-forwarding)
+## 3. SRE Automation & Testing
+Thành phần `sre-bot` trong `knative_functions` sẽ lắng nghe tín hiệu từ Prometheus để thực hiện các hành động tự chữa lành (remediation):
+- **Restart service**: Dùng khi hệ thống bị treo hoặc lỗi pod.
+- **Flush cache**: Dùng khi dữ liệu cache bị lỗi thời hoặc tràn.
+- **Auto-scale**: Tự động tăng pod cho service `payment` khi có burst traffic.
 
-### 3. SRE Automation
-The SRE bot in `knative_functions/sre-bot` is triggered by Prometheus alerts to perform self-healing actions.
-
-## Testing
-
-Run the local simulator to verify the bot logic:
+Chạy simulator để verify logic bot:
 ```bash
-make test
+make test-sre
 ```
 
-For load testing:
-```bash
-bash tests/load-test/load_test.sh http://localhost:80/orders 60
-```
+## 4. Cấu trúc thư mục
+- `/services`: Source code của các microservices.
+- `/deploy`: Toàn bộ K8s manifests (Secret, Deployment, Ingress).
+- `/knative_functions/sre-bot`: Logic xử lý của bot tự động hóa.
+- `/tests`: Các kịch bản load test và simulator.
+
+---
+**Maintainer**: SRE Team - Viettel Cloud Center (VCC)
+**Contact**: sre-support@viettel.com.vn

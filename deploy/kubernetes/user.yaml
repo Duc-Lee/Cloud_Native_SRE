@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: user
 spec:
-  replicas: 1 # scaled down for dev
+  replicas: 1 
   selector:
     matchLabels:
       app: user
@@ -23,15 +23,39 @@ spec:
         - name: POSTGRES_DB
           value: "cloud_sre"
         - name: POSTGRES_USER
-          value: "sre_user"
+          valueFrom:
+            secretKeyRef:
+              name: cloud-sre-secrets
+              key: POSTGRES_USER
         - name: POSTGRES_PASSWORD
-          value: "password"
-        # Just readiness for now, liveness is overkill
+          valueFrom:
+            secretKeyRef:
+              name: cloud-sre-secrets
+              key: POSTGRES_PASSWORD
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cloud-sre-secrets
+              key: JWT_SECRET_KEY
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 15
         readinessProbe:
           httpGet:
             path: /health
             port: 3000
           initialDelaySeconds: 5
+          periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service

@@ -1,35 +1,45 @@
-# SRE Project Makefile
+# --- Viettel Cloud Native SRE (CN-SRE) ---
+# Project: cloud-native-sre
+# Author: SRE Team <sre-team@viettel.com.vn>
 
-# Build docker images for all services
+# Image versioning
+VERSION=$(shell git rev-parse --short HEAD 2>/dev/null || echo "v1")
+REGISTRY=viettel-registry.local
+
+# Main targets
+all: build deploy
+
+# Building microservices
 build:
-	docker build -t auth-service:latest services/auth
-	docker build -t cart-service:latest services/cart
-	docker build -t notification-service:latest services/notification
-	docker build -t order-service:latest services/order
-	docker build -t payment-service:latest services/payment
-	docker build -t product-service:latest services/product
-	docker build -t user-service:latest services/user
-	docker build -t sre-bot-remedian:latest knative_functions/sre-bot
+	@echo ">> Build version: $(VERSION)"
+	docker build -t $(REGISTRY)/auth:$(VERSION) services/auth
+	docker build -t $(REGISTRY)/cart:$(VERSION) services/cart
+	docker build -t $(REGISTRY)/notification:$(VERSION) services/notification
+	docker build -t $(REGISTRY)/order:$(VERSION) services/order
+	docker build -t $(REGISTRY)/payment:$(VERSION) services/payment
+	docker build -t $(REGISTRY)/product:$(VERSION) services/product
+	docker build -t $(REGISTRY)/user:$(VERSION) services/user
+	docker build -t $(REGISTRY)/sre-bot:$(VERSION) knative_functions/sre-bot
 
-# Deploy system to Kubernetes
+# K8s deployment
 deploy:
 	kubectl apply -f deploy/kubernetes/
 	kubectl apply -f deploy/kubernetes/knative-service.yaml
 
-# Run the SRE simulator script
-test:
+# Simulator for SRE testing
+test-bot:
 	export PYTHONPATH="knative_functions/sre-bot" && python tests/simulator_sre.py
 
-# Cleanup all k8s resources
+# Cleanup
 clean:
-	kubectl delete -f deploy/kubernetes/
-	kubectl delete -f deploy/kubernetes/knative-service.yaml
+	kubectl delete -f deploy/kubernetes/ --ignore-not-found
+	kubectl delete -f deploy/kubernetes/knative-service.yaml --ignore-not-found
 
-# Help command for quick reference
 help:
-	@echo "Commands:"
-	@echo "  make build   - Build all docker images"
-	@echo "  make deploy  - Apply k8s manifests"
-	@echo "  make test    - Run SRE bot simulator"
-	@echo "  make clean   - Remove all k8s resources"
+	@echo "Viettel SRE Platform"
+	@echo "--------------------"
+	@echo "make build    : Build images"
+	@echo "make deploy   : Deploy k8s"
+	@echo "make test-bot : Run simulator"
+	@echo "make clean    : Remove resource"
 

@@ -3,13 +3,17 @@ services:
     image: postgres:15
     environment:
       POSTGRES_DB: cloud_sre
-      POSTGRES_USER: sre_user
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: leanhduc
+      POSTGRES_PASSWORD: anhdc2005
 
   rabbitmq:
     image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: leanhduc2005
+      RABBITMQ_DEFAULT_PASS: leanhduc2005_rabbit
     ports:
       - "15672:15672"
+      - "5672:5672"
 
   redis:
     image: redis:7
@@ -20,12 +24,16 @@ services:
       - "3001:3000"
     environment:
       POSTGRES_HOST: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: leanhduc
+      POSTGRES_PASSWORD: anhdc2005
+      JWT_SECRET_KEY: anhducjwt
 
   auth:
     build: services/auth
     ports:
       - "3004:3000"
+    environment:
+      JWT_SECRET_KEY: anhducjwt
 
   order:
     build: services/order
@@ -33,7 +41,7 @@ services:
       - "3002:3000"
     environment:
       USER_SERVICE_URL: http://user:3000
-      RABBIT_URL: amqp://guest:guest@rabbitmq:5672/
+      RABBIT_URL: amqp://leanhduc2005:leanhduc2005_rabbit@rabbitmq:5672/
 
   payment:
     build: services/payment
@@ -53,6 +61,6 @@ services:
   notification:
     build: services/notification
     environment:
-      RABBIT_URL: amqp://guest:guest@rabbitmq:5672/
+      RABBIT_URL: amqp://leanhduc2005:leanhduc2005_rabbit@rabbitmq:5672/
     depends_on:
       - rabbitmq

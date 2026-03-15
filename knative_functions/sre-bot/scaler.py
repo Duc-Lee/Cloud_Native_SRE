@@ -1,10 +1,10 @@
 import json
 import logging
 
-log = logging.getLogger("sre.scaler")
+log = logging.getLogger("viettel.sre.scaler")
 
 def handle(req):
-    """Auto-scaler for high-value transactions"""
+    # Dynamic scaling for payment service during bursty traffic
     data = json.loads(req or '{}')
     val = float(data.get("amount") or 0)
     
