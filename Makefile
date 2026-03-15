@@ -1,10 +1,7 @@
-# --- Viettel Cloud Native SRE (CN-SRE) ---
-# Project: cloud-native-sre
-# Author: SRE Team <sre-team@viettel.com.vn>
-
+# --- Cloud Native SRE (CN-SRE) ---
 # Image versioning
 VERSION=$(shell git rev-parse --short HEAD 2>/dev/null || echo "v1")
-REGISTRY=viettel-registry.local
+REGISTRY=local-registry.local
 
 # Main targets
 all: build deploy

@@ -1,6 +1,6 @@
-# Viettel Cloud Native SRE (CN-SRE) Platform
+# Cloud Native SRE (CN-SRE) Platform
 
-Hệ thống giả lập môi trường Microservices chuẩn Cloud Native phục vụ nghiên cứu và triển khai các giải pháp SRE (Site Reliability Engineering) tự động hóa. Dự án tập trung vào việc xử lý các kịch bản thực tế về Self-healing, Traffic Scaling và giám sát SLO/SLI cho hạ tầng Viettel.
+Hệ thống giả lập môi trường Microservices chuẩn Cloud Native phục vụ nghiên cứu và triển khai các giải pháp SRE (Site Reliability Engineering) tự động hóa. Dự án tập trung vào việc xử lý các kịch bản thực tế về Self-healing, Traffic Scaling và giám sát SLO/SLI.
 
 ## 1. Kiến trúc hệ thống
 Hệ thống bao gồm 8 microservices chính được viết trên nền tảng Python (FastAPI):
@@ -45,5 +45,5 @@ make test-sre
 - `/tests`: Các kịch bản load test và simulator.
 
 ---
-**Maintainer**: SRE Team - Viettel Cloud Center (VCC)
-**Contact**: sre-support@viettel.com.vn
+**Maintainer**: SRE Project Team
+**Contact**: support@sre-project.io
