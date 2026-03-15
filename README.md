@@ -2,13 +2,13 @@
 
 Hệ thống giả lập môi trường Microservices chuẩn Cloud Native phục vụ nghiên cứu và triển khai các giải pháp SRE (Site Reliability Engineering) tự động hóa. Dự án tập trung vào việc xử lý các kịch bản thực tế về Self-healing, Traffic Scaling và giám sát SLO/SLI.
 
-## 1. Bài toán (Problem Statement)
+## 1. Bài toán 
 Trong các hệ thống Microservices hiện đại, việc duy trì tính sẵn sàng (Availability) và độ tin cậy (Reliability) đối mặt với nhiều thách thức:
 - **Độ phức tạp cao**: Khó khăn trong việc phát hiện và cô lập lỗi giữa hàng chục service liên kết với nhau.
 - **Phản ứng chậm**: Việc xử lý sự cố thủ công (manual remediation) thường gây trễ, ảnh hưởng đến trải nghiệm người dùng và vi phạm cam kết chất lượng (SLA/SLO).
 - **Lãng phí tài nguyên**: Thiếu cơ chế tự động mở rộng (scaling) linh hoạt dựa trên tải thực tế, dẫn đến việc cấp phát tài nguyên không tối ưu.
 
-## 2. Giải pháp (Proposed Solution)
+## 2. Giải pháp 
 Dự án đề xuất mô hình **CN-SRE Platform** tích hợp cơ chế tự động hóa:
 - **Self-healing (Tự chữa lành)**: Sử dụng các `sre-bot` (Knative Functions) để tự động restart service hoặc dọn dẹp cache ngay khi phát hiện lỗi từ hệ thống giám sát.
 - **Dynamic Scaling**: Tự động điều chỉnh số lượng Pod dựa trên lưu lượng giao dịch thực tế để đảm bảo hiệu năng tối ưu.
@@ -54,7 +54,3 @@ make test-sre
 - `/deploy`: Toàn bộ K8s manifests (Secret, Deployment, Ingress).
 - `/knative_functions/sre-bot`: Logic xử lý của bot tự động hóa.
 - `/tests`: Các kịch bản load test và simulator.
-
----
-**Maintainer**: SRE Project Team
-**Contact**: support@sre-project.io
